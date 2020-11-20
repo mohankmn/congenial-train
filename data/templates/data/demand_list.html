@@ -12,6 +12,7 @@
           <th scope="col">Name</th>
           <th scope="col">Price</th>
           <th scope="col">Quantity</th>
+          <th scope="col">Total</th>
           <th scope="col">Time</th>
         </tr>
       </thead>
@@ -19,8 +20,9 @@
       <tbody>
         <tr>
           <th scope="row">{{ d.product.name }}</th>
-          <td>{{ d.product.price }}</td>
+          <td>{{ d.price }}</td>
           <td>{{d.quantity}}</td>
+          <td>{{d.total}}</td>
           <td>{{d.date}}</td>
         </tr>
       </tbody>
