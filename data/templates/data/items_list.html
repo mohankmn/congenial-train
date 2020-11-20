@@ -7,13 +7,27 @@
 
 {% block content  %}
 
+
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+          </tr>
+        </thead>
     {% for item in items %}
-      <div class="alert alert-warning" role="alert">
-        {{ item.name }}--{{ item.price }}
-        <a href="{% url 'data:update_item' item.id %}">Update</a>
-        <a href="{% url 'data:delete_items' item.id %}">Delete</a>
-      </div>
+        <tbody>
+          <tr>
+            <th scope="row">{{ item.name }}</th>
+            <td>{{ item.price }}</td>
+            <td><a href="{% url 'data:update_item' item.id %}">Update</a></td>
+            <td><a href="{% url 'data:delete_items' item.id %}">Delete</a></td>
+          </tr>
+        </tbody>
     {% endfor %}
+      </table>
+
 
 
 {% endblock %}
