@@ -15,16 +15,8 @@ class ItemsForm(forms.ModelForm):
 class DemandForm(forms.ModelForm):
     class Meta:
         model =Demand
-        fields=['product','quantity']
+        fields='__all__'
 
-    def save(self):
-        new_demand=Demand.objects.create(
-            product=self.cleaned_data.get('product'),
-            quantity =self.cleaned_data.get('quantity'),
-
-        
-        )
-        return new_demand
 
 
 
