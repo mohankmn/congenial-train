@@ -11,8 +11,6 @@ from django.shortcuts import reverse
 
 # Create your views here.
 
-
-
 def items_list(request):
     items=Items.objects.all()
     return render(request,'data/items_list.html',context={'items':items})
@@ -31,12 +29,6 @@ def ItemCreate(request):
                     
         return render(request,'data/item_create.html',context={'form':form})
 
-
-
-
-
-
-
 class DemandCreate(View):
     def get(self,request):
         form=DemandForm()
@@ -50,10 +42,6 @@ class DemandCreate(View):
             return render(request,'data/demand_create.html',context={'form':form})
 
         
-
-
-
-
 def delete_items(request,pk):
     query_set=Items.objects.get(id=pk)
     if request.method=='POST':
