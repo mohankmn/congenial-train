@@ -6,11 +6,25 @@
 
 {% block content  %}
 
-    {% for d in demand %}
-      <div class="alert alert-warning" role="alert">
-        {{ d.product.name }}--{{ d.product.price }}--{{d.quantity}}--{{d.date}}
-        
-      </div>
-    {% endfor %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Price</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Time</th>
+        </tr>
+      </thead>
+      {% for d in demand %}
+      <tbody>
+        <tr>
+          <th scope="row">{{ d.product.name }}</th>
+          <td>{{ d.product.price }}</td>
+          <td>{{d.quantity}}</td>
+          <td>{{d.date}}</td>
+        </tr>
+      </tbody>
+      {% endfor %}
+  </table>
 
 {% endblock %}
