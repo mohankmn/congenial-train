@@ -6,6 +6,10 @@ from django.utils import timezone
 # Create your models here.
 class Items(models.Model):
     name =models.CharField(max_length=150, db_index=True,unique=True)
+    carrying_cost=models.PositiveIntegerField(blank=True,null=True)
+    ordering_cost=models.PositiveIntegerField(blank=True,null=True)
+    present_inventory=models.PositiveIntegerField(blank=False,null=True)
+
 
     def __str__(self):
         return "{}".format(self.name)
@@ -15,13 +19,18 @@ class Items(models.Model):
 
 class Demand(models.Model):
     product=models.ForeignKey('Items', on_delete=models.CASCADE)
-    price=models.PositiveIntegerField(blank=True, null=True)
+    price=models.PositiveIntegerField(blank=False,null=True)
     date=models.DateTimeField(default=timezone.now)
     quantity=models.PositiveIntegerField()
     total=models.PositiveIntegerField(blank=True,null=True)
+    Inventory_left=models.PositiveIntegerField(blank=True,null=True)
 
     def save(self,*args,**kwargs):
         self.total=(self.price)*self.quantity
+        super().save(*args,**kwargs)
+
+    def save(self,*args,**kwargs):
+        self.Inventory_left=(self.product.present_inventory)-self.quantity
         super().save(*args,**kwargs)
     
     def __str__(self):
