@@ -16,6 +16,10 @@ class DemandForm(forms.ModelForm):
     class Meta:
         model =Demand
         fields='__all__'
+class IssueForm(forms.ModelForm):
+	class Meta:
+		model = Demand
+		fields = ['quantity']
 
 
 

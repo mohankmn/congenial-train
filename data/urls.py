@@ -9,9 +9,13 @@ urlpatterns = [
     path('demand/',demand_list,name='demand_list_url'),
 
     path('item/create/',ItemCreate,name='item_create_url'),
-    path('demand/create/',DemandCreate.as_view(),name='demand_create_url'),
+    path('demand/create/',DemandCreate,name='demand_create_url'),
     path('delete_items/<str:pk>/', delete_items, name="delete_items"),
-    path('update_item/<str:pk>/',update_items,name="update_item")
+    path('update_item/<str:pk>/',update_items,name="update_item"),
+
+
+
+
     
 
 

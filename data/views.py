@@ -29,17 +29,15 @@ def ItemCreate(request):
                     
         return render(request,'data/item_create.html',context={'form':form})
 
-class DemandCreate(View):
-    def get(self,request):
+def DemandCreate(request):
         form=DemandForm()
+        if request.method == 'POST':
+            form=DemandForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('data:demand_list_url')
+                    
         return render(request,'data/demand_create.html',context={'form':form})
-
-    def post(self,request):
-        bound_form = DemandForm(request.POST)
-        if bound_form.is_valid():
-            new_demand=bound_form.save()
-            form=DemandForm()
-            return render(request,'data/demand_create.html',context={'form':form})
 
         
 def delete_items(request,pk):
@@ -59,6 +57,18 @@ def update_items(request,pk):
             return redirect('data:items_list_url')
     context={'form':form}
     return render(request,'data/item_create.html',context)
+
+
+
+
+
+
+
+
+    
+
+
+
 
 
 
