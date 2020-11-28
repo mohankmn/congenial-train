@@ -8,18 +8,22 @@ class ItemsForm(forms.ModelForm):
     class Meta:
         model =Items
         fields='__all__'
+    def clean_name(self):
+      name=self.cleaned_data.get('name').upper()
+      if not name:
+        raise forms.ValidationError('Fill This Field')
+      for i in Items.objects.all():
+        if i.name == name:
+          raise forms.ValidationError(name + '  is already exists')
+      return name
 
-#    def save(self):new_item=Items.objects.create(name=self.cleaned_data.get('name'),            price =self.cleaned_data.get('price'),)
+
+class ItemSearchForm(forms.ModelForm):
+   class Meta:
+     model = Items
+     fields = ['name']
 
 
-class DemandForm(forms.ModelForm):
-    class Meta:
-        model =Demand
-        fields='__all__'
-class IssueForm(forms.ModelForm):
-	class Meta:
-		model = Demand
-		fields = ['quantity']
 
 
 

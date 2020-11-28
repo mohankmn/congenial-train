@@ -13,7 +13,12 @@ from django.shortcuts import reverse
 
 def items_list(request):
     items=Items.objects.all()
-    return render(request,'data/items_list.html',context={'items':items})
+    form = ItemSearchForm(request.POST or None)
+
+    if request.method == 'POST':
+	        items = Items.objects.filter(name__icontains=form['name'].value())
+	        
+    return render(request,'data/items_list.html',context = {"form": form,"items":items})
 
 def demand_list(request):
     demand=Demand.objects.all()
@@ -29,15 +34,7 @@ def ItemCreate(request):
                     
         return render(request,'data/item_create.html',context={'form':form})
 
-def DemandCreate(request):
-        form=DemandForm()
-        if request.method == 'POST':
-            form=DemandForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('data:demand_list_url')
-                    
-        return render(request,'data/demand_create.html',context={'form':form})
+
 
         
 def delete_items(request,pk):
@@ -59,6 +56,23 @@ def update_items(request,pk):
     return render(request,'data/item_create.html',context)
 
 
+
+"""def issue_items(request, pk):
+	queryset = Demand.objects.get(id=pk)
+	form = IssueForm(request.POST or None, instance=queryset)
+	if form.is_valid():
+		instance = form.save(commit=False)
+		instance.quantity -= instance.issue_quantity
+		instance.save()
+
+		return redirect('data:items_list_url')
+		# return HttpResponseRedirect(instance.get_absolute_url())
+
+	context = {
+		"queryset": queryset,
+		"form": form,
+	}
+	return render(request, "data/add_items.html", context)"""
 
 
 
