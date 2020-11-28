@@ -3,7 +3,7 @@ from django.db.models.fields import SlugField
 from django.shortcuts import reverse
 from django.utils import timezone
 
-# Create your models here.
+# Create your models here
 class Items(models.Model):
     name =models.CharField(max_length=150)
     
