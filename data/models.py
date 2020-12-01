@@ -1,10 +1,10 @@
 from django.db import models
-from django.db.models.fields import SlugField
-from django.shortcuts import reverse
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models her
 class Items(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="todolist")
     name =models.CharField(max_length=150)
     
     def __str__(self):

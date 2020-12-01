@@ -23,5 +23,6 @@ urlpatterns = [
     path('data/',include('data.urls')),
     path('upload/',include('csvs.urls')),
     path("register/", v.register, name="register"),
-    path('', include("django.contrib.auth.urls"))
+	path('login/', v.loginPage, name="login"),  
+    path('logout/', v.logoutUser, name="logout"),
 ]

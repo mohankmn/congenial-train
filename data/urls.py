@@ -12,6 +12,7 @@ urlpatterns = [
 
     path('delete_items/<str:pk>/', delete_items, name="delete_items"),
     path('update_item/<str:pk>/',update_items,name="update_item"),
+    path('view/',view,name="view"),
 
 
 

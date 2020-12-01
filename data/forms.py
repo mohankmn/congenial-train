@@ -7,7 +7,7 @@ from .models import Items,Demand
 class ItemsForm(forms.ModelForm):
     class Meta:
         model =Items
-        fields='__all__'
+        fields=['name']
     def clean_name(self):
       name=self.cleaned_data.get('name').upper()
       if not name:
