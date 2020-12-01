@@ -1,20 +1,23 @@
 from django import forms
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import fields
+from django.http import request
 
 from .models import Items,Demand
+
 
 class ItemsForm(forms.ModelForm):
     class Meta:
         model =Items
-        fields=['name']
+        fields=['name','lead_time']
     def clean_name(self):
       name=self.cleaned_data.get('name').upper()
-      if not name:
+      """if not name:
         raise forms.ValidationError('Fill This Field')
       for i in Items.objects.all():
         if i.name == name:
-          raise forms.ValidationError(name + '  is already exists')
+          raise forms.ValidationError(name + '  is already exists')"""
       return name
 
 
