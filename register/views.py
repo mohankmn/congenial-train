@@ -17,9 +17,8 @@ def register(response):
 					user = form.cleaned_data.get("username")
 					form.save()
 					messages.success(response,'Account was created for '+ user)
-			
-				return redirect("/login")
-		return render(response, "register/register.html", {"form":form})
+					return redirect("/login")
+			return render(response, "register/register.html", {"form":form})
 
 def loginPage(request):
 	if request.user.is_authenticated:

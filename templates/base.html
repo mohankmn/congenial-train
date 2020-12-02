@@ -35,8 +35,8 @@
       <li class="nav-item active">
         <a class="nav-link" href="{% url 'data:demand_list_url' %}">Demand</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'data:item_create_url' %}">new Item</a>
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'data:item_create_url' %}">Add Item</a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="{% url 'data:items_list_url' %}">Items</a>
@@ -63,6 +63,7 @@
 
 
               {% block content %}
+              
               {%  endblock %}
 
           </div>
