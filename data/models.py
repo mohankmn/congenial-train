@@ -7,6 +7,8 @@ class Items(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name="items")
     name =models.CharField(max_length=150)
     lead_time=models.PositiveIntegerField(default='0',blank=True,null=True)
+    carrying_cost=models.PositiveIntegerField(default='0',blank=True,null=True)
+    ordering_cost=models.PositiveIntegerField(default='0',blank=True,null=True)
     
     def __str__(self):
         return "{}".format(self.name)
@@ -17,7 +19,7 @@ class Items(models.Model):
 
 class Demand(models.Model):
     item=models.ForeignKey('Items', on_delete=models.CASCADE)
-    price=models.PositiveIntegerField(blank=False,null=True)
+    price=models.PositiveIntegerField(default='0',blank=True,null=True)
     date=models.DateTimeField(default=timezone.now)
     quantity=models.IntegerField(default='0',blank=True,null=True)
     total=models.IntegerField(default='0',blank=True,null=True)

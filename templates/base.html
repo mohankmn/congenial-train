@@ -25,7 +25,7 @@
     margin-right: 20px;
   }
 </style>
-
+{% if user.is_authenticated %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -36,17 +36,14 @@
         <a class="nav-link" href="{% url 'data:demand_list_url' %}">Demand</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="{% url 'data:item_create_url' %}">Add Item</a>
-      </li>
-      <li class="nav-item active">
         <a class="nav-link" href="{% url 'data:items_list_url' %}">Items</a>
       </li>
     </ul>
   </div>
 
-  <span class="hello-msg">Hello, {{request.user}}</span>
+  <span class="hello-msg">Welcome , {{  request.user}}</span>
   <span ><a  class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
-
+{% endif %}
 </nav>
 
 

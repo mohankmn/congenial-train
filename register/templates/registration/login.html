@@ -9,6 +9,14 @@ Login Here
 
 
 {% block content %}
+
+{% for message in messages %}
+		<div class="alert alert-danger" role="alert">
+  			{{message}}
+		</div>
+{%endfor%}
+
+
 <form method="POST" action="">
 	{% csrf_token %}
 	<div class="input-group mb-3">
@@ -26,16 +34,21 @@ Login Here
 
 			<input type="password" name="password" placeholder="Password..." class="form-control" >
 	</div>
+	
 
-		<div class="d-flex justify-content-center mt-3 login_container">
+		<div class="d-flex justify-content-center mt-3 login_container" >
 			 <input class="btn login_btn" type="submit" value="Login">
 		   </div>
 
-		   {%for message in messages %}
-		   <p id="message">{{message}}</p>
-	   {%endfor%}
-   
-	   <p>Don't have an account? Create one <a href="/register">here</a></p>
+		   
+		   <br>
+
+
+
+		  <div class="alert alert-dark" role="alert">
+			Don't have an account? Create one <a href="/register" class="alert-link">Here</a>.
+		  </div>
+	  
 </form>
 
 

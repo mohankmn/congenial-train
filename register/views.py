@@ -35,7 +35,7 @@ def loginPage(request):
 				login(request, user)
 				return redirect('data:item_create_url')
 			else:
-				messages.info(request, 'Username OR password is incorrect')
+				messages.error(request, 'Username OR password is incorrect')
 
 		context = {}
 		return render(request, 'registration/login.html', context)
