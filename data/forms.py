@@ -10,7 +10,7 @@ from .models import Items,Demand
 class ItemsForm(forms.ModelForm):
     class Meta:
         model =Items
-        fields=['name','lead_time','carrying_cost','ordering_cost']
+        fields=['name','lead_time','carrying_cost','ordering_cost','total_inventory']
     def clean_name(self):
       name=self.cleaned_data.get('name').upper()
       """if not name:
@@ -25,7 +25,10 @@ class ItemSearchForm(forms.ModelForm):
    class Meta:
      model = Items
      fields = ['name']
-
+class IssueForm(forms.ModelForm):
+  class Meta:
+    model=Items
+    fields=['issue_quantity','price']
 
 
 

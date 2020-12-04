@@ -50,12 +50,13 @@ def ItemCreate(request):
                 l = form.cleaned_data["lead_time"]
                 c = form.cleaned_data["carrying_cost"]
                 o = form.cleaned_data["ordering_cost"]
+                q = form.cleaned_data["total_inventory"]
                 for i in request.user.items.all():
                     if i.name==n:
                         messages.error(request, n +' Item Already Created')
                         return redirect('data:item_create_url')
 
-                t = Items(name=n,lead_time=l,carrying_cost=c,ordering_cost=o)
+                t = Items(name=n,lead_time=l,carrying_cost=c,ordering_cost=o,total_inventory=q)
                 t.save()
                 request.user.items.add(t) 
                 messages.success(request, n +' Item Created')
@@ -92,26 +93,38 @@ def update_items(request,pk):
 
 """def view(response):
     return render(response, "data/view.html", {})"""
+	
+	
 
 
 
-"""def issue_items(request, pk):
-	queryset = Demand.objects.get(id=pk)
-	form = IssueForm(request.POST or None, instance=queryset)
-	if form.is_valid():
-		instance = form.save(commit=False)
-		instance.quantity -= instance.issue_quantity
-		instance.save()
+def issue_items(request, pk):
+    queryset = Items.objects.get(id=pk)
+    form=IssueForm()
 
-		return redirect('data:items_list_url')
-		# return HttpResponseRedirect(instance.get_absolute_url())
+    if request.method=='POST':
+        form=IssueForm(request.POST,instance=queryset)
+        if form.is_valid():
+            queryset.total_inventory -= queryset.issue_quantity
+            form.save()
 
-	context = {
-		"queryset": queryset,
-		"form": form,
-	}
-	return render(request, "data/add_items.html", context)"""
+            return redirect('data:items_list_url')
+    context = {"queryset":queryset,"form":form}
+    return render(request, "data/add_items.html", context)
 
+def add_inventory(request, pk):
+    queryset = Items.objects.get(id=pk)
+    form=IssueForm()
+
+    if request.method=='POST':
+        form=IssueForm(request.POST,instance=queryset)
+        if form.is_valid():
+            queryset.total_inventory += queryset.issue_quantity
+            form.save()
+
+            return redirect('data:items_list_url')
+    context = {"queryset":queryset,"form":form}
+    return render(request, "data/add_inventory.html", context)
 
 
 
