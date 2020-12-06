@@ -6,13 +6,15 @@
 
 {% block content  %}
 
+
+
+
     <table class="table table-striped">
       <thead>
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Price</th>
           <th scope="col">Quantity</th>
-          <th scope="col">Total</th>
           <th scope="col">Time</th>
 
         </tr>
@@ -20,11 +22,12 @@
       {% for d in demand %}
       <tbody>
         <tr>
-          <th scope="row">{{ d.product.name }}</th>
+          <th scope="row">{{ d.item.name }}</th>
           <td>{{ d.price }}</td>
-          <td>{{d.quantity}}</td>
-          <td>{{d.total}}</td>
+          <td>{{d.issue_quantity}}</td>
           <td>{{d.date}}</td>
+
+
 
 
         </tr>

@@ -1,4 +1,7 @@
 from django.contrib.auth.models import User
+from django.db.models.aggregates import Avg, StdDev,Sum,Variance
+from django.db.models.expressions import F
+
 from django.shortcuts import get_object_or_404, render
 from numpy.core.fromnumeric import product
 from .models import Items,Demand
@@ -18,6 +21,7 @@ from django.core.exceptions import ValidationError
 @login_required(login_url='login')
 def items_list(request):
     ite=None
+    total=None
 
     try:
         ite=request.user.items.all()
@@ -30,14 +34,40 @@ def items_list(request):
                 ite = request.user.items.filter(name__icontains=form['name'].value())
             except ObjectDoesNotExist:
                 messages.info(request,"There is no items.")
-    return render(request,'data/items_list.html',context = {"form": form,"items":ite})
+    return render(request,'data/items_list.html',context = {"form": form,"items":ite,"total":total})
 
 
 @login_required(login_url='login')
-def demand_list(request):
+def demand_list(request,*args,**kwargs):
     demand=Demand.objects.all()
     return render(request,'data/demand_list.html',context={'demand':demand})
 
+
+@login_required(login_url='login')
+def DemandCreate(request):
+        form=DemandForm()
+        if request.method == 'POST':
+            form=DemandForm(request.POST) 
+            if form.is_valid():
+                n = form.cleaned_data["item"]
+                l = form.cleaned_data["issue_quantity"]
+                c = form.cleaned_data["price"]
+                o = form.cleaned_data["recieve_quantity"]
+
+                reporter = Items.objects.get(name=n)
+                reporter.total_inventory = F('total_inventory')-l+o
+                reporter.save()
+
+                
+                
+                
+
+                t = Demand(item=n,issue_quantity=l,price=c,recieve_quantity=o)
+                t.save()
+
+                return redirect('data:demand_create_url')
+                    
+        return render(request,'data/demand_create.html',context={'form':form })
 
 
 @login_required(login_url='login')
@@ -50,19 +80,21 @@ def ItemCreate(request):
                 l = form.cleaned_data["lead_time"]
                 c = form.cleaned_data["carrying_cost"]
                 o = form.cleaned_data["ordering_cost"]
-                q = form.cleaned_data["total_inventory"]
+                t = form.cleaned_data["total_inventory"]
+                u = form.cleaned_data["unit_costprice"]
+                y = form.cleaned_data["yearly_demand"]
                 for i in request.user.items.all():
                     if i.name==n:
                         messages.error(request, n +' Item Already Created')
                         return redirect('data:item_create_url')
 
-                t = Items(name=n,lead_time=l,carrying_cost=c,ordering_cost=o,total_inventory=q)
+                t = Items(name=n,lead_time=l,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,yearly_demand=y)
                 t.save()
                 request.user.items.add(t) 
                 messages.success(request, n +' Item Created')
                 return redirect('data:items_list_url')
                     
-        return render(request,'data/item_create.html',context={'form':form})
+        return render(request,'data/item_create.html',context={'form':form })
 
 
 
@@ -91,6 +123,14 @@ def update_items(request,pk):
     context={'form':form}
     return render(request,'data/update_item.html',context)
 
+def calculations(request):
+    average=Demand.objects.values('item_id').order_by('item').annotate(Avg('issue_quantity'),Variance('issue_quantity'))
+    
+
+    average[0]['issue_quantity__avg']
+    return render(request,'data/calculations.html',context={'average':average})
+
+
 """def view(response):
     return render(response, "data/view.html", {})"""
 	
@@ -98,7 +138,7 @@ def update_items(request,pk):
 
 
 
-def issue_items(request, pk):
+"""def issue_items(request, pk):
     queryset = Items.objects.get(id=pk)
     form=IssueForm()
 
@@ -110,9 +150,9 @@ def issue_items(request, pk):
 
             return redirect('data:items_list_url')
     context = {"queryset":queryset,"form":form}
-    return render(request, "data/add_items.html", context)
+    return render(request, "data/add_items.html", context)"""
 
-def add_inventory(request, pk):
+"""def add_inventory(request, pk):
     queryset = Items.objects.get(id=pk)
     form=IssueForm()
 
@@ -124,7 +164,9 @@ def add_inventory(request, pk):
 
             return redirect('data:items_list_url')
     context = {"queryset":queryset,"form":form}
-    return render(request, "data/add_inventory.html", context)
+    return render(request, "data/add_inventory.html", context)"""
+
+
 
 
 

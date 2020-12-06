@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content  %}
+
 {% for message in messages %}
   <div class="alert alert-danger" role="alert">
     {{message}}
@@ -25,7 +26,8 @@
         <thead>
           <tr>
             <th scope="col">Name</th>
-            <th scope="col">Inventory Left</th>
+            <th scope="col">Inventory</th>
+            <th scope="col">EOQ</th>
             <th scope="col"></th>
             <th scope="col"></th>
             <th scope="col"></th>
@@ -40,13 +42,11 @@
           <tr>
 
             <th scope="row">{{ item.name }}</th>
-            <td><div class="alert alert-secondary" role="alert">
-              {{item.total_inventory}}
-            </div></td>
+            <td>{{item.total_inventory}}</td>
+            <td>{{item.eoq}}</td>
             <td><a href="{% url 'data:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
             <td><a href="{% url 'data:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
-            <td><a href="{% url 'data:issue_item' item.id %}" class="btn btn-outline-success" role="button">Issue</a></td>
-            <td><a href="{% url 'data:add_inventory' item.id %}" class="btn btn-outline-danger" role="button">Add Inventory</a></td>
+
 
 
 

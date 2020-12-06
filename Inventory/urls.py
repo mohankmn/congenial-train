@@ -21,7 +21,6 @@ from register import views as v
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('data/',include('data.urls')),
-    path('upload/',include('csvs.urls')),
     path("register/", v.register, name="register"),
 	path('login/', v.loginPage, name="login"),  
     path('logout/', v.logoutUser, name="logout"),

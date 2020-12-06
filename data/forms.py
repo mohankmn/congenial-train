@@ -10,7 +10,7 @@ from .models import Items,Demand
 class ItemsForm(forms.ModelForm):
     class Meta:
         model =Items
-        fields=['name','lead_time','carrying_cost','ordering_cost','total_inventory']
+        fields=['name','yearly_demand','unit_costprice','carrying_cost','ordering_cost','total_inventory','lead_time']
     def clean_name(self):
       name=self.cleaned_data.get('name').upper()
       """if not name:
@@ -20,15 +20,18 @@ class ItemsForm(forms.ModelForm):
           raise forms.ValidationError(name + '  is already exists')"""
       return name
 
-
+class DemandForm(forms.ModelForm):
+  class Meta:
+    model=Demand
+    fields='__all__'
 class ItemSearchForm(forms.ModelForm):
    class Meta:
      model = Items
      fields = ['name']
-class IssueForm(forms.ModelForm):
+"""class IssueForm(forms.ModelForm):
   class Meta:
-    model=Items
-    fields=['issue_quantity','price']
+    model=Demand
+    fields=['issue_quantity','price']"""
 
 
 
