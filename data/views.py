@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from numpy.core.fromnumeric import product
 from .models import Items,Demand
 import pandas as pd
+import numpy as np
 from django.views.generic import TemplateView
 from .forms import *
 from django.views.generic import View
@@ -124,11 +125,23 @@ def update_items(request,pk):
     return render(request,'data/update_item.html',context)
 
 def calculations(request):
-    average=Demand.objects.values('item_id').order_by('item').annotate(Avg('issue_quantity'),Variance('issue_quantity'))
-    
+    item_df=pd.DataFrame(Items.objects.all().values())
+    demand_df=pd.DataFrame(Demand.objects.all().values())
+    item_df['item_id']=item_df['id']
+    df=pd.merge(item_df,demand_df,on='item_id').drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand','total_inventory','eoq'],axis=1).rename({'item_id':'id'},axis=1)
+    df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean'})
+    df1['LT*Mean']=df1['issue_quantity']['mean']*df1['lead_time']['mean']
+    df1['LT*variance']=df1['issue_quantity']['var']*df1['lead_time']['mean']
+    df1['LT*variance1']=(np.sqrt(df1['LT*variance']))*1.65
+    df1['reorder_quantity']=df1['LT*Mean']+df1['LT*variance']
 
-    average[0]['issue_quantity__avg']
-    return render(request,'data/calculations.html',context={'average':average})
+
+
+    context={
+        'df':df.to_html,
+        'df1':df1.to_html,
+    }
+    return render(request,'data/calculations.html',context)
 
 
 """def view(response):
@@ -173,13 +186,6 @@ def calculations(request):
 
 
     
-
-
-
-
-
-
-
 
 
 

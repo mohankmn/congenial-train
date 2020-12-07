@@ -12,8 +12,8 @@ class Items(models.Model):
     lead_time=models.PositiveIntegerField(default='0',blank=True,null=True)
     carrying_cost=models.PositiveIntegerField(default='0',blank=False,null=True)
     ordering_cost=models.PositiveIntegerField(default='0',blank=False,null=True)
-    unit_costprice=models.PositiveIntegerField(blank=False,null=True)
-    yearly_demand=models.PositiveIntegerField(blank=False,null=True)
+    unit_costprice=models.PositiveIntegerField(default='0',blank=False,null=True)
+    yearly_demand=models.PositiveIntegerField(default='0',blank=False,null=True)
     total_inventory=models.IntegerField(default='0',blank=True,null=True)
     eoq=models.IntegerField(default='0',blank=True,null=True)
     
@@ -26,7 +26,10 @@ class Items(models.Model):
         return super().save(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        self.eoq = math.sqrt((2*self.yearly_demand*self.ordering_cost)/(self.unit_costprice*self.carrying_cost))
+        if self.unit_costprice & self.carrying_cost != 0:
+            self.eoq = math.sqrt((2*self.yearly_demand*self.ordering_cost)/(self.unit_costprice*self.carrying_cost))
+        else:
+            self.eoq=0
         return super().save(*args, **kwargs)
 
     
@@ -40,7 +43,7 @@ class Demand(models.Model):
     issue_quantity=models.IntegerField(blank=False,null=True)
     price=models.PositiveIntegerField(blank=False,null=True)
     recieve_quantity=models.IntegerField(default='0',blank=False,null=True)
-    date=models.DateField(auto_now_add=True)
+    date=models.DateField(default=timezone.now)
 
 
         

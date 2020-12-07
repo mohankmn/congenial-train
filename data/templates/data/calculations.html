@@ -6,38 +6,10 @@
 
 {% block content  %}
 
-
-
-
-
-<table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Item</th>
-        <th scope="col">average</th>
-        <th scope="col">variance</th>
-
-
-      </tr>
-    </thead>
-
-    {% for k in average %}
-    <tbody>
-      <tr>
-        <th scope="row">{{k.item_id}}</th>
-        <td>{{k.issue_quantity__avg}}</td>
-        <td>{{k.issue_quantity__variance}}</td>
-
-
-
-
-
-      </tr>
-    </tbody>
-    {% endfor %}
-
-</table>
-
+{{items|safe}}
+{{demand|safe}}
+{{df|safe}}
+{{df1|safe}}
 
 
 {% endblock %}

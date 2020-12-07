@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'data',
     'crispy_forms',
     'register.apps.RegisterConfig',
+    'csvs'
 ]
 
 MIDDLEWARE = [
