@@ -73,6 +73,7 @@ class Items(models.Model):
 
 
 class Demand(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name="demand")
     item=models.ForeignKey('Items', on_delete=models.CASCADE,related_name="demands")
     issue_quantity=models.IntegerField(blank=False,null=True)
     price=models.PositiveIntegerField(blank=False,null=True)

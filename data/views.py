@@ -40,8 +40,12 @@ def items_list(request):
 
 @login_required(login_url='login')
 def demand_list(request,*args,**kwargs):
-    demand=Demand.objects.all()
-    return render(request,'data/demand_list.html',context={'demand':demand})
+    itee=None
+    try:
+        itee=request.user.demand.all()
+    except ObjectDoesNotExist:
+        messages.info(request,"There is no demand")
+    return render(request,'data/demand_list.html',context={'demand':itee})
 
 
 @login_required(login_url='login')
@@ -56,11 +60,12 @@ def DemandCreate(request):
                 o = form.cleaned_data["recieve_quantity"]
                 d = form.cleaned_data["date"]
 
-                reporter = Items.objects.get(name=n)
+                reporter = request.user.items.get(name=n)
                 reporter.total_inventory = F('total_inventory')-l+o
                 reporter.save()
                 t = Demand(item=n,issue_quantity=l,price=c,recieve_quantity=o,date=d)
                 t.save()
+                request.user.demand.add(t)
 
                 return redirect('data:demand_create_url')
                     
@@ -129,21 +134,29 @@ def update_items(request,pk):
 
 def calculations(request):
     item_df=pd.DataFrame(Items.objects.all().values().filter(user=request.user))
-    demand_df=pd.DataFrame(Demand.objects.all().values())
-    """item_df['item_id']=item_df['id']
-    df=pd.merge(item_df,demand_df,on=['item_id',).drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand'],axis=1).rename({'item_id':'id'},axis=1)
-    df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean','total_inventory':'mean','eoq':'mean','z':'mean'})
-    df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*df1['z']['mean'])
+    demand_df=pd.DataFrame(Demand.objects.all().values().filter(user=request.user))
+    item_df['item_id']=item_df['id']
+    df=pd.merge(item_df,demand_df,on='item_id').drop(['id_y','id_x','carrying_cost','ordering_cost','unit_costprice','lead_time','service_level','standard_deviation','average_daily_demand','total_inventory','eoq','no_of_workingdays','rq','z','user_id_y','price','recieve_quantity'],axis=1).rename({'item_id':'id'},axis=1)
+    del df['user_id_x']
+    del df['id']
+#df1=df.groupby(['name','date'],as_index=False).aggregate({'issue_quantity':['var','mean']})
+#df.groupby(df['date'])['issue_quantity'].sum()
+    df['date'] = pd.to_datetime(df['date'])
+
+    
+    dg = df.groupby([pd.Grouper(key='date', freq='1M'),'name']).aggregate({'issue_quantity':['mean','std','count','sum']}) # groupby each 1 month
+
+    """df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*df1['z']['mean'])
     del df1['issue_quantity']
-    del df1['lead_time']
-    df1.rename(columns = {'total_inventory':'Inventory Left'}, inplace = True) 
-    df1.rename(columns = {'mean':''}, inplace = True) 
-    df1.rename(columns = {'':''}, inplace = True) 
-    df1.rename(columns = {'eoq':'EOQ'}, inplace = True) 
-    df1.rename(columns = {'name':'Item Name'}, inplace = True)"""
+    del df1['lead_time']"""
+
+    dg.rename(columns = {'issue_quantity':'Demand'}, inplace = True) 
+    dg.rename(columns = {'mean':'Daily Average'}, inplace = True) 
+    dg.rename(columns = {'std':'Standard deviation'}, inplace = True) 
+    dg.rename(columns = {'count':'Frequency'}, inplace = True) 
+    dg.rename(columns = {'sum':'Total Demand'}, inplace = True) 
     context={
-        'df1':item_df.to_html,
-        'df2':demand_df.to_html,
+        'df2':dg.to_html,
     }
     return render(request,'data/calculations.html',context)
 

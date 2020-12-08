@@ -27,6 +27,7 @@ class DemandForm(forms.ModelForm):
   class Meta:
     model=Demand
     fields='__all__'
+    exclude={'user'}
   def __init__(self,user=None,*args,**kwargs):
     super(DemandForm,self).__init__(*args,**kwargs)
     if user:
