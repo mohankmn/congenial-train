@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg, StdDev,Sum,Variance
 from django.db.models.expressions import F
-
 from django.shortcuts import get_object_or_404, render
 from numpy.core.fromnumeric import product
 from .models import Items,Demand
@@ -54,16 +53,12 @@ def DemandCreate(request):
                 l = form.cleaned_data["issue_quantity"]
                 c = form.cleaned_data["price"]
                 o = form.cleaned_data["recieve_quantity"]
+                d = form.cleaned_data["date"]
 
                 reporter = Items.objects.get(name=n)
                 reporter.total_inventory = F('total_inventory')-l+o
                 reporter.save()
-
-                
-                
-                
-
-                t = Demand(item=n,issue_quantity=l,price=c,recieve_quantity=o)
+                t = Demand(item=n,issue_quantity=l,price=c,recieve_quantity=o,date=d)
                 t.save()
 
                 return redirect('data:demand_create_url')
@@ -83,13 +78,23 @@ def ItemCreate(request):
                 o = form.cleaned_data["ordering_cost"]
                 t = form.cleaned_data["total_inventory"]
                 u = form.cleaned_data["unit_costprice"]
-                y = form.cleaned_data["yearly_demand"]
+                y = form.cleaned_data["average_daily_demand"]
+                s = form.cleaned_data["service_level"]
+                d = form.cleaned_data["standard_deviation"]
+                w = form.cleaned_data["no_of_workingdays"]
                 for i in request.user.items.all():
                     if i.name==n:
                         messages.error(request, n +' Item Already Created')
                         return redirect('data:item_create_url')
+                """if c > 100:
+                    messages.error(request,'carrying cost should be less than 100')
+                    return redirect('data:item_create_url')"""
 
-                t = Items(name=n,lead_time=l,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,yearly_demand=y)
+
+
+                
+
+                t = Items(name=n,lead_time=l,average_daily_demand=y,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,service_level=s,standard_deviation=d,no_of_workingdays=w)
                 t.save()
                 request.user.items.add(t) 
                 messages.success(request, n +' Item Created')
@@ -128,17 +133,17 @@ def calculations(request):
     item_df=pd.DataFrame(Items.objects.all().values())
     demand_df=pd.DataFrame(Demand.objects.all().values())
     item_df['item_id']=item_df['id']
-    df=pd.merge(item_df,demand_df,on='item_id').drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand','total_inventory','eoq'],axis=1).rename({'item_id':'id'},axis=1)
-    df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean'})
-    df1['LT*Mean']=df1['issue_quantity']['mean']*df1['lead_time']['mean']
-    df1['LT*variance']=df1['issue_quantity']['var']*df1['lead_time']['mean']
-    df1['LT*variance1']=(np.sqrt(df1['LT*variance']))*1.65
-    df1['reorder_quantity']=df1['LT*Mean']+df1['LT*variance']
-
-
-
+    df=pd.merge(item_df,demand_df,on='item_id').drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand'],axis=1).rename({'item_id':'id'},axis=1)
+    df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean','total_inventory':'mean','eoq':'mean'})
+    df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*1.65)
+    del df1['issue_quantity']
+    del df1['lead_time']
+    df1.rename(columns = {'total_inventory':'Inventory Left'}, inplace = True) 
+    df1.rename(columns = {'mean':''}, inplace = True) 
+    df1.rename(columns = {'':''}, inplace = True) 
+    df1.rename(columns = {'eoq':'EOQ'}, inplace = True) 
+    df1.rename(columns = {'name':'Item Name'}, inplace = True) 
     context={
-        'df':df.to_html,
         'df1':df1.to_html,
     }
     return render(request,'data/calculations.html',context)

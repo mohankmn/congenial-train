@@ -2,20 +2,42 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 import math
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here
+
+def validate_even(value):
+    if value > 100:
+        raise ValidationError(
+            _('%(value)s is not less than 100 percent'),
+            params={'value': value},
+        )
+"""def validate_name(request,value):
+    for i in request.user.items.all():
+        value=value.upper()
+        if i.name==value:
+            raise ValidationError(
+                _('%(value)s is not less than 100 percent'),
+                params={'value': value},
+        )"""
+
 
 
 class Items(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name="items")
     name =models.CharField(max_length=150)
     lead_time=models.PositiveIntegerField(default='0',blank=True,null=True)
-    carrying_cost=models.PositiveIntegerField(default='0',blank=False,null=True)
+    service_level=models.PositiveIntegerField(default='0',blank=True,null=True)
+    standard_deviation=models.PositiveIntegerField(default='0',blank=True,null=True)
+    carrying_cost=models.PositiveIntegerField(default='0',blank=False,validators=[validate_even],help_text='Enter as percentage of unit cost')
     ordering_cost=models.PositiveIntegerField(default='0',blank=False,null=True)
     unit_costprice=models.PositiveIntegerField(default='0',blank=False,null=True)
-    yearly_demand=models.PositiveIntegerField(default='0',blank=False,null=True)
+    average_daily_demand=models.PositiveIntegerField(default='0',blank=False,null=True)
     total_inventory=models.IntegerField(default='0',blank=True,null=True)
     eoq=models.IntegerField(default='0',blank=True,null=True)
+    no_of_workingdays=models.IntegerField(default='0',blank=True,null=True)
+    z=models.DecimalField(max_digits=4,decimal_places=3,default='0',blank=True,null=True)
     
     
     def __str__(self):
@@ -26,11 +48,9 @@ class Items(models.Model):
         return super().save(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        if self.unit_costprice & self.carrying_cost != 0:
-            self.eoq = math.sqrt((2*self.yearly_demand*self.ordering_cost)/(self.unit_costprice*self.carrying_cost))
-        else:
-            self.eoq=0
+        self.eoq = math.sqrt((2*self.no_of_workingdays*self.average_daily_demand*self.ordering_cost)/(self.unit_costprice*self.carrying_cost))
         return super().save(*args, **kwargs)
+
 
     
 
@@ -43,7 +63,7 @@ class Demand(models.Model):
     issue_quantity=models.IntegerField(blank=False,null=True)
     price=models.PositiveIntegerField(blank=False,null=True)
     recieve_quantity=models.IntegerField(default='0',blank=False,null=True)
-    date=models.DateField(default=timezone.now)
+    date=models.DateField(default=timezone.now,editable=True)
 
 
         
