@@ -28,6 +28,7 @@
             <th scope="col">Name</th>
             <th scope="col">Inventory</th>
             <th scope="col">EOQ</th>
+            <th scope="col">Reorder Quantity</th>
             <th scope="col"></th>
             <th scope="col"></th>
             <th scope="col"></th>
@@ -44,6 +45,7 @@
             <th scope="row">{{ item.name }}</th>
             <td>{{item.total_inventory}}</td>
             <td>{{item.eoq}}</td>
+            <td>{{item.rq}}</td>
             <td><a href="{% url 'data:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
             <td><a href="{% url 'data:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
 

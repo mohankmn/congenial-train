@@ -1,3 +1,4 @@
+import math
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg, StdDev,Sum,Variance
 from django.db.models.expressions import F
@@ -45,7 +46,7 @@ def demand_list(request,*args,**kwargs):
 
 @login_required(login_url='login')
 def DemandCreate(request):
-        form=DemandForm()
+        form=DemandForm(user=request.user)
         if request.method == 'POST':
             form=DemandForm(request.POST) 
             if form.is_valid():
@@ -78,23 +79,20 @@ def ItemCreate(request):
                 o = form.cleaned_data["ordering_cost"]
                 t = form.cleaned_data["total_inventory"]
                 u = form.cleaned_data["unit_costprice"]
-                y = form.cleaned_data["average_daily_demand"]
                 s = form.cleaned_data["service_level"]
-                d = form.cleaned_data["standard_deviation"]
                 w = form.cleaned_data["no_of_workingdays"]
+                d = form.cleaned_data["standard_deviation"]
+                a = form.cleaned_data["average_daily_demand"]
+
                 for i in request.user.items.all():
                     if i.name==n:
                         messages.error(request, n +' Item Already Created')
                         return redirect('data:item_create_url')
-                """if c > 100:
-                    messages.error(request,'carrying cost should be less than 100')
-                    return redirect('data:item_create_url')"""
-
 
 
                 
 
-                t = Items(name=n,lead_time=l,average_daily_demand=y,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,service_level=s,standard_deviation=d,no_of_workingdays=w)
+                t = Items(name=n,lead_time=l,average_daily_demand=a,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,service_level=s,no_of_workingdays=w,standard_deviation=d)
                 t.save()
                 request.user.items.add(t) 
                 messages.success(request, n +' Item Created')
@@ -134,8 +132,8 @@ def calculations(request):
     demand_df=pd.DataFrame(Demand.objects.all().values())
     item_df['item_id']=item_df['id']
     df=pd.merge(item_df,demand_df,on='item_id').drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand'],axis=1).rename({'item_id':'id'},axis=1)
-    df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean','total_inventory':'mean','eoq':'mean'})
-    df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*1.65)
+    df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean','total_inventory':'mean','eoq':'mean','z':'mean'})
+    df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*df1['z']['mean'])
     del df1['issue_quantity']
     del df1['lead_time']
     df1.rename(columns = {'total_inventory':'Inventory Left'}, inplace = True) 

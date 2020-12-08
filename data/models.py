@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 import math
+from numpy.lib.function_base import average
+import scipy.stats as st
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -37,20 +39,32 @@ class Items(models.Model):
     total_inventory=models.IntegerField(default='0',blank=True,null=True)
     eoq=models.IntegerField(default='0',blank=True,null=True)
     no_of_workingdays=models.IntegerField(default='0',blank=True,null=True)
+    rq=models.IntegerField(default='0',blank=True,null=True)
     z=models.DecimalField(max_digits=4,decimal_places=3,default='0',blank=True,null=True)
+ 
     
     
     def __str__(self):
         return "{}".format(self.name)
     
+
     def save(self, *args, **kwargs):
         self.name = self.name.upper()
+        self.eoq = math.sqrt((2*self.no_of_workingdays*self.average_daily_demand*self.ordering_cost)/(self.unit_costprice*(self.carrying_cost/100)))
+        self.z=(st.norm.ppf(self.service_level/100))
+        self.rq=(self.lead_time*self.average_daily_demand)+(self.z*self.standard_deviation*(self.lead_time))
         return super().save(*args, **kwargs)
 
-    def save(self, *args, **kwargs):
-        self.eoq = math.sqrt((2*self.no_of_workingdays*self.average_daily_demand*self.ordering_cost)/(self.unit_costprice*self.carrying_cost))
+    """def save(self,*args,**kwargs):
+        self.z=int((st.norm.ppf(self.service_level/100)))*1000
+        return super().save(*args, **kwargs)"""
+    """def save(self,*args,**kwargs):
+        self.lt=(math.sqrt(self.lead_time))*1000
         return super().save(*args, **kwargs)
 
+    def save(self,*args,**kwargs):
+        self.rq=(self.lead_time*self.average_daily_demand)+(self.z*self.standard_deviation*(self.lt))/1000000
+        return super().save(*args, **kwargs)"""
 
     
 

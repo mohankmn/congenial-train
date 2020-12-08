@@ -26,6 +26,10 @@ class DemandForm(forms.ModelForm):
   class Meta:
     model=Demand
     fields='__all__'
+  def __init__(self,user=None,**kwargs):
+    super(DemandForm,self).__init__(**kwargs)
+    if user:
+      self.fields['item'].queryset=Items.objects.filter(user=user)
 class ItemSearchForm(forms.ModelForm):
    class Meta:
      model = Items
