@@ -46,9 +46,9 @@ def demand_list(request,*args,**kwargs):
 
 @login_required(login_url='login')
 def DemandCreate(request):
-        form=DemandForm(user=request.user)
+        form=DemandForm(request.user)
         if request.method == 'POST':
-            form=DemandForm(request.POST) 
+            form=DemandForm(request.user,request.POST) 
             if form.is_valid():
                 n = form.cleaned_data["item"]
                 l = form.cleaned_data["issue_quantity"]
@@ -64,7 +64,7 @@ def DemandCreate(request):
 
                 return redirect('data:demand_create_url')
                     
-        return render(request,'data/demand_create.html',context={'form':form })
+        return render(request,'data/demand_create.html',context={'form':DemandForm(request.user) })
 
 
 @login_required(login_url='login')
@@ -128,10 +128,10 @@ def update_items(request,pk):
     return render(request,'data/update_item.html',context)
 
 def calculations(request):
-    item_df=pd.DataFrame(Items.objects.all().values())
+    item_df=pd.DataFrame(Items.objects.all().values().filter(user=request.user))
     demand_df=pd.DataFrame(Demand.objects.all().values())
-    item_df['item_id']=item_df['id']
-    df=pd.merge(item_df,demand_df,on='item_id').drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand'],axis=1).rename({'item_id':'id'},axis=1)
+    """item_df['item_id']=item_df['id']
+    df=pd.merge(item_df,demand_df,on=['item_id',).drop(['user_id','id_y','id_x','carrying_cost','ordering_cost','unit_costprice','yearly_demand'],axis=1).rename({'item_id':'id'},axis=1)
     df1=df.groupby(['name']).aggregate({'issue_quantity':['var','mean'],'lead_time':'mean','total_inventory':'mean','eoq':'mean','z':'mean'})
     df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*df1['z']['mean'])
     del df1['issue_quantity']
@@ -140,9 +140,10 @@ def calculations(request):
     df1.rename(columns = {'mean':''}, inplace = True) 
     df1.rename(columns = {'':''}, inplace = True) 
     df1.rename(columns = {'eoq':'EOQ'}, inplace = True) 
-    df1.rename(columns = {'name':'Item Name'}, inplace = True) 
+    df1.rename(columns = {'name':'Item Name'}, inplace = True)"""
     context={
-        'df1':df1.to_html,
+        'df1':item_df.to_html,
+        'df2':demand_df.to_html,
     }
     return render(request,'data/calculations.html',context)
 

@@ -1,4 +1,5 @@
 
+from os import name
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -26,8 +27,8 @@ class DemandForm(forms.ModelForm):
   class Meta:
     model=Demand
     fields='__all__'
-  def __init__(self,user=None,**kwargs):
-    super(DemandForm,self).__init__(**kwargs)
+  def __init__(self,user=None,*args,**kwargs):
+    super(DemandForm,self).__init__(*args,**kwargs)
     if user:
       self.fields['item'].queryset=Items.objects.filter(user=user)
 class ItemSearchForm(forms.ModelForm):
