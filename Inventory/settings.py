@@ -27,7 +27,7 @@ SECRET_KEY = 'yc##of9a8il-1r8yrd3+xf#+3sc8l&u(2_^qxwnf6eco4o_&6c'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['invcontrolapp.herokuapp.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
