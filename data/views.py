@@ -18,6 +18,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 
 
+
 # Create your views here.
 @login_required(login_url='login')
 def items_list(request):
@@ -132,37 +133,41 @@ def update_items(request,pk):
     context={'form':form}
     return render(request,'data/update_item.html',context)
 
+
+
+@login_required(login_url='login')
 def calculations(request):
     item_df=pd.DataFrame(Items.objects.all().values().filter(user=request.user))
     demand_df=pd.DataFrame(Demand.objects.all().values().filter(user=request.user))
-    item_df['item_id']=item_df['id']
-    df=pd.merge(item_df,demand_df,on='item_id').drop(['id_y','id_x','carrying_cost','ordering_cost','unit_costprice','lead_time','service_level','standard_deviation','average_daily_demand','total_inventory','eoq','no_of_workingdays','rq','z','user_id_y','price','recieve_quantity'],axis=1).rename({'item_id':'id'},axis=1)
-    del df['user_id_x']
-    del df['id']
-#df1=df.groupby(['name','date'],as_index=False).aggregate({'issue_quantity':['var','mean']})
-#df.groupby(df['date'])['issue_quantity'].sum()
-    df['date'] = pd.to_datetime(df['date'])
-
-    
-    dg = df.groupby([pd.Grouper(key='date', freq='1M'),'name']).aggregate({'issue_quantity':['mean','std','count','sum']}) # groupby each 1 month
-
-    """df1['Reorder Quantity']=(df1['issue_quantity']['mean']*df1['lead_time']['mean'])+((np.sqrt(df1['issue_quantity']['var']*df1['lead_time']['mean']))*df1['z']['mean'])
-    del df1['issue_quantity']
-    del df1['lead_time']"""
-
-    dg.rename(columns = {'issue_quantity':'Demand'}, inplace = True) 
-    dg.rename(columns = {'mean':'Daily Average'}, inplace = True) 
-    dg.rename(columns = {'std':'Standard deviation'}, inplace = True) 
-    dg.rename(columns = {'count':'Frequency'}, inplace = True) 
-    dg.rename(columns = {'sum':'Total Demand'}, inplace = True) 
-    context={
-        'df2':dg.to_html,
-    }
-    return render(request,'data/calculations.html',context)
+    if demand_df.shape[0]>0:
+        item_df['item_id']=item_df['id']
+        df=pd.merge(item_df,demand_df,on='item_id').drop(['id_y','id_x','carrying_cost','ordering_cost','unit_costprice','lead_time','service_level','standard_deviation','average_daily_demand','total_inventory','eoq','no_of_workingdays','rq','z','user_id_y','price','recieve_quantity'],axis=1).rename({'item_id':'id'},axis=1)
+        del df['user_id_x']
+        del df['id']
+        df.rename(columns = {'date':'End of the Month'}, inplace = True)
+        df.rename(columns = {'name':'Item Name'}, inplace = True)
+        df['End of the Month'] = pd.to_datetime(df['End of the Month'])
+        df = df.groupby([pd.Grouper(key='End of the Month', freq='1M'),'Item Name']).aggregate({'issue_quantity':['mean','std','count','sum']}) # groupby each 1 month
+        df.rename(columns = {'issue_quantity':'Demand'}, inplace = True) 
+        df.rename(columns = {'mean':'Daily Average'}, inplace = True) 
+        df.rename(columns = {'std':'Standard deviation'}, inplace = True) 
+        df.rename(columns = {'count':'Frequency'}, inplace = True) 
+        df.rename(columns = {'sum':'Total Demand'}, inplace = True) 
+        df=df.to_html(classes=('table table-striped'))
+        
 
 
-"""def view(response):
-    return render(response, "data/view.html", {})"""
+
+        return render(request,'data/calculations.html',context={'df2':df})
+    else:
+        error='<h3>No Data to Analyze</h3>'
+        return render(request,'data/calculations.html',context={'df2':error})
+
+
+
+
+
+
 	
 	
 

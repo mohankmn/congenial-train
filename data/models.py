@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 import math
-from numpy.lib.function_base import average
 import scipy.stats as st
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -10,31 +9,30 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here
 
 def validate_even(value):
-    if value > 100:
+    if value > 100 or value == 0:
         raise ValidationError(
-            _('%(value)s is not less than 100 percent'),
+            _('%(value)s is not in between 0 and 100 percent'),
             params={'value': value},
         )
-"""def validate_name(request,value):
-    for i in request.user.items.all():
-        value=value.upper()
-        if i.name==value:
-            raise ValidationError(
-                _('%(value)s is not less than 100 percent'),
-                params={'value': value},
-        )"""
+def validate_zero(value):
+    if value == 0:
+        raise ValidationError(
+            _('%(value)s cant be zero'),
+            params={'value': value},
+        )
+
 
 
 
 class Items(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name="items")
     name =models.CharField(max_length=150)
-    lead_time=models.PositiveIntegerField(default='0',blank=True,null=True)
-    service_level=models.PositiveIntegerField(default='0',blank=True,null=True)
+    lead_time=models.PositiveIntegerField(default='0',blank=True,null=True,validators=[validate_zero])
+    service_level=models.PositiveIntegerField(default='0',blank=True,null=True,validators=[validate_even])
     standard_deviation=models.PositiveIntegerField(default='0',blank=True,null=True)
     carrying_cost=models.PositiveIntegerField(default='0',blank=False,validators=[validate_even],help_text='Enter as percentage of unit cost')
     ordering_cost=models.PositiveIntegerField(default='0',blank=False,null=True)
-    unit_costprice=models.PositiveIntegerField(default='0',blank=False,null=True)
+    unit_costprice=models.PositiveIntegerField(default='0',blank=False,null=True,validators=[validate_zero])
     average_daily_demand=models.PositiveIntegerField(default='0',blank=False,null=True)
     total_inventory=models.IntegerField(default='0',blank=True,null=True)
     eoq=models.IntegerField(default='0',blank=True,null=True)

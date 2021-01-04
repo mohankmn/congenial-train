@@ -23,6 +23,6 @@ urlpatterns = [
     path('data/',include('data.urls')),
     path('csv/',include('csvs.urls')),
     path("register/", v.register, name="register"),
-	path('login/', v.loginPage, name="login"),  
+	path('', v.loginPage, name="login"),  
     path('logout/', v.logoutUser, name="logout"),
 ]

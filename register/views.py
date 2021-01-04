@@ -17,7 +17,7 @@ def register(response):
 					user = form.cleaned_data.get("username")
 					form.save()
 					messages.success(response,'Account was created for '+ user)
-					return redirect("/login")
+					return redirect("/")
 			return render(response, "register/register.html", {"form":form})
 
 def loginPage(request):
@@ -36,9 +36,7 @@ def loginPage(request):
 				return redirect('data:item_create_url')
 			else:
 				messages.error(request, 'Username OR password is incorrect')
-
-		context = {}
-		return render(request, 'registration/login.html', context)
+		return render(request, 'registration/login.html')
 
 def logoutUser(request):
 	logout(request)
