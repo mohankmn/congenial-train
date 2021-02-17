@@ -27,10 +27,10 @@ def validate_zero(value):
 class Items(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name="items")
     name =models.CharField(max_length=150)
-    lead_time=models.PositiveIntegerField(default='0',blank=True,null=True,validators=[validate_zero])
-    service_level=models.PositiveIntegerField(default='0',blank=True,null=True,validators=[validate_even])
+    lead_time=models.PositiveIntegerField(default='5',blank=True,null=True,validators=[validate_zero])
+    service_level=models.PositiveIntegerField(default='95',blank=True,null=True,validators=[validate_even])
     standard_deviation=models.PositiveIntegerField(default='0',blank=True,null=True)
-    carrying_cost=models.PositiveIntegerField(default='0',blank=False,validators=[validate_even],help_text='Enter as percentage of unit cost')
+    carrying_cost=models.PositiveIntegerField(default='15',blank=False,validators=[validate_even],help_text='Enter as percentage of unit cost')
     ordering_cost=models.PositiveIntegerField(default='0',blank=False,null=True)
     unit_costprice=models.PositiveIntegerField(default='0',blank=False,null=True,validators=[validate_zero])
     average_daily_demand=models.PositiveIntegerField(default='0',blank=False,null=True)
